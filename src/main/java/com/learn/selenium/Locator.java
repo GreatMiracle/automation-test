@@ -1,13 +1,12 @@
 package com.learn.selenium;
 
+import com.learn.selenium.utils.ElementFinding;
+import com.learn.selenium.utils.LinkWebPratice;
 import com.learn.selenium.utils.TypeDriver;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.devtools.DevTools;
-import org.openqa.selenium.devtools.v121.page.Page;
 import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -15,8 +14,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.time.Duration;
-
-import static java.lang.Thread.sleep;
 
 @SpringBootApplication
 public class Locator {
@@ -29,15 +26,15 @@ public class Locator {
 
         WebDriver driver = new FirefoxDriver();
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
-
-        driver.get("https://rahulshettyacademy.com/locatorspractice");
+        driver.manage().window().maximize();
+        driver.get(LinkWebPratice.LOCATORS.getUrlLink());
 
         // CSS Selector
-		Thread.sleep(1000);
+        Thread.sleep(1000);
 //		driver.findElement(By.id("inputUsername")).sendKeys(userName);
 //		driver.findElement(By.name("inputPassword")).sendKeys(pwd);
-        inputValue(driver, userName, "inputUsername", TypeDriver.ID);
-        inputValue(driver, pwd, "inputPassword", TypeDriver.NAME);
+        ElementFinding.elementValue(driver, userName, "inputUsername", TypeDriver.ID);
+        ElementFinding.elementValue(driver, pwd, "inputPassword", TypeDriver.NAME);
 
         Thread.sleep(500);
 //		driver.findElement(By.cssSelector("button[type='submit']")).click();
@@ -47,69 +44,66 @@ public class Locator {
 
         if (driver.findElement(By.cssSelector(".error.error")).getText().equals("* Incorrect username or password")) {
             driver.findElement(By.linkText("Forgot your password?")).click();
-			Thread.sleep(1000);
-            inputValue(driver, "John", "input[placeholder='Name']", TypeDriver.CSSSELECTOR);
+            Thread.sleep(1000);
+            ElementFinding.elementValue(driver, "John", "input[placeholder='Name']", TypeDriver.CSSSELECTOR);
 
-			Thread.sleep(200);
-            inputValue(driver, "john@rsa.com", "input[placeholder='Email']", TypeDriver.CSSSELECTOR);
+            Thread.sleep(200);
+            ElementFinding.elementValue(driver, "john@rsa.com", "input[placeholder='Email']", TypeDriver.CSSSELECTOR);
 
             Thread.sleep(500);
             driver.findElement(By.cssSelector("input[placeholder='Email']")).clear();
 
             Thread.sleep(200);
-            inputValue(driver, "john@gmail.com", "input[placeholder='Email']", TypeDriver.CSSSELECTOR);
+            ElementFinding.elementValue(driver, "john@gmail.com", "input[placeholder='Email']", TypeDriver.CSSSELECTOR);
 
-			Thread.sleep(200);
-            inputValue(driver, "0123456789", "input[placeholder='Phone Number']", TypeDriver.CSSSELECTOR);
+            Thread.sleep(200);
+            ElementFinding.elementValue(driver, "0123456789", "input[placeholder='Phone Number']", TypeDriver.CSSSELECTOR);
 
-			Thread.sleep(500);
+            Thread.sleep(500);
             driver.findElement(By.xpath("//button[normalize-space()='Reset Login']")).click();
-			WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5)); // Thời gian chờ tối đa là 5 giây
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5)); // Thời gian chờ tối đa là 5 giây
 
-			// Chờ cho phần tử .infoMsg xuất hiện
-			WebElement infoMsgElement = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//p[@class='infoMsg']")));
-			String infoMsgResetLogin = infoMsgElement.getText();
+            // Chờ cho phần tử .infoMsg xuất hiện
+            WebElement infoMsgElement = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//p[@class='infoMsg']")));
+            String infoMsgResetLogin = infoMsgElement.getText();
             if (infoMsgResetLogin.equals("Please use temporary password 'rahulshettyacademy' to Login.")) {
-				Thread.sleep(500);
+                Thread.sleep(500);
                 driver.findElement(By.xpath("//button[normalize-space()='Go to Login']")).click();
             }
 
-			Thread.sleep(1000);
-            inputValue(driver, "rahul", "inputUsername", TypeDriver.ID);
-            inputValue(driver, "rahulshettyacademy", "inputPassword", TypeDriver.NAME);
+            Thread.sleep(1000);
+            ElementFinding.elementValue(driver, "rahul", "inputUsername", TypeDriver.ID);
+            ElementFinding.elementValue(driver, "rahulshettyacademy", "inputPassword", TypeDriver.NAME);
 
             Thread.sleep(500);
             driver.findElement(By.cssSelector("button[type='submit']")).click();
 
+
+            WebDriverWait waitLoginSuccess = new WebDriverWait(driver, Duration.ofSeconds(5)); // Thời gian chờ tối đa là 5 giây
+
+            // Chờ cho phần tử .infoMsg xuất hiện
+            WebElement successMessage = waitLoginSuccess.until(ExpectedConditions.visibilityOfElementLocated(
+                    By.xpath("//p[normalize-space()='You are successfully logged in.']")
+            ));
+//            List<WebElement> successMessageElements = driver.findElements(
+//                    By.xpath("//p[normalize-space()='You are successfully logged in.']"));
+
+            if (successMessage != null) {
+                // Login was successful, proceed to logout
+                Thread.sleep(5000);
+                WebElement logoutButton = driver.findElement(By.xpath("//button[normalize-space()='Log Out']"));
+                logoutButton.click();
+                System.out.println("Logged out successfully.");
+            } else {
+                System.out.println("Login failed or success message not found.");
+            }
         }
 
         // Đóng cửa sổ trình duyệt hiện tại
-//		driver.close();
+        driver.close();
 
-		// Đóng trình duyệt
+        // Đóng trình duyệt
 //		driver.quit();
-	}
-
-    private static void inputValue(WebDriver driver, String value, String cssSyntax, TypeDriver type) {
-        WebElement driverField;
-        switch (type) {
-            case ID -> driverField = driver.findElement(By.id(cssSyntax));
-            case CSSSELECTOR -> driverField = driver.findElement(By.cssSelector(cssSyntax));
-            case XPATH -> driverField = driver.findElement(By.xpath(cssSyntax));
-            case NAME -> driverField = driver.findElement(By.name(cssSyntax));
-            default -> {
-                throw new IllegalArgumentException("Unsupported locator type: " + type);
-            }
-        }
-
-        for (char c : value.toCharArray()) {
-            driverField.sendKeys(String.valueOf(c));
-            try {
-                sleep(150); // Tạm dừng 150 milliseconds giữa các ký tự
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
 }
