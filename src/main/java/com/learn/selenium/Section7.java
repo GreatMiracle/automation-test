@@ -43,9 +43,40 @@ public class Section7 {
          *     selectByValue(String value): Chọn tùy chọn theo giá trị thuộc tính value của thẻ <option>.
          *
          */
+        Thread.sleep(1000);
+        driver.findElement(By.cssSelector("#divpaxinfo")).click();
 
-/*		driver.close();
-		driver.quit();*/
+        Thread.sleep(1000);
+
+        int child = (int)(Math.random() * 5);
+        int infant = (int)(Math.random() * 5);
+        int adult = (int)(Math.random() * (9-child));
+
+        for (int i = 1; i < adult; i++) {
+            Thread.sleep(500);
+            driver.findElement(By.cssSelector("#hrefIncAdt")).click();
+
+        }
+
+        Thread.sleep(1000);
+        for (int i = 1; i < child; i++) {
+            Thread.sleep(500);
+            driver.findElement(By.cssSelector("#hrefIncChd")).click();
+        }
+
+        Thread.sleep(1000);
+        for (int i = 1; i < infant; i++) {
+            Thread.sleep(500);
+            driver.findElement(By.cssSelector("#hrefIncInf")).click();
+        }
+
+        Thread.sleep(1000);
+        driver.findElement(By.cssSelector("#btnclosepaxoption")).click();
+
+
+        Thread.sleep(5000);
+///*		driver.close();
+		driver.quit();
     }
 
 }
