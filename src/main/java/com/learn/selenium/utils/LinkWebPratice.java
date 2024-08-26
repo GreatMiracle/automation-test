@@ -5,6 +5,7 @@ public enum LinkWebPratice {
     LOCATORS("https://rahulshettyacademy.com/locatorspractice"),
     SELENIUM("https://rahulshettyacademy.com/seleniumPractise"),
     SENT_BE("https://autofx-fe-dev.sentbe.net/login"),
+    ASSERTIONS("https://www.spicejet.com/"),
 
     ;
 
