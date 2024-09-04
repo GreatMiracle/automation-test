@@ -7,13 +7,18 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Select;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.time.Duration;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -123,9 +128,61 @@ public class Section7 {
         Thread.sleep(1000);
         radioAndCheckbox(driver, "//div[@id='discount-checkbox']//input", TypeDriver.XPATH);
 
+        Thread.sleep(1000);
+        driver.findElement(By.xpath("//input[@id='ctl00_mainContent_view_date1']")).click();
+
+        LocalDate desiredDate = LocalDate.of(2025, 10, 2);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM yyyy");
+        String inputMonth = desiredDate.format(formatter);
+
+        String monthLeft;
+        String monthRight;
+        LocalDate monthLeftToLocalDate;
+        LocalDate monthRightToLocalDate;
+
+        do {
+            monthLeft = driver.findElement(By.xpath("(//div[@class='ui-datepicker-title'])[1]")).getText();
+            monthRight =driver.findElement(By.xpath("(//div[@class='ui-datepicker-title'])[2]")).getText();
+            monthLeftToLocalDate = convertStringToLocalDate(monthLeft);
+            monthRightToLocalDate = convertStringToLocalDate(monthRight);
+
+            if (monthLeftToLocalDate.getMonth().compareTo(desiredDate.getMonth()) > 0 && monthLeftToLocalDate.getYear() >= desiredDate.getYear()
+                    && monthRightToLocalDate.getMonth().compareTo(desiredDate.getMonth()) > 0 && monthRightToLocalDate.getYear() >= desiredDate.getYear()) {
+
+                WebElement prevButton = driver.findElement(By.xpath("//a[@title='Prev']"));
+                Actions actions = new Actions(driver);
+                actions.moveToElement(prevButton).perform();
+                Thread.sleep(1000);
+                prevButton.click();
+                System.out.println("next");
+            } else if (monthLeftToLocalDate.getMonth().compareTo(desiredDate.getMonth()) < 0 && monthLeftToLocalDate.getYear() <= desiredDate.getYear()
+                    && monthRightToLocalDate.getMonth().compareTo(desiredDate.getMonth()) < 0 && monthRightToLocalDate.getYear() <= desiredDate.getYear()) {
+                WebElement nextButton = driver.findElement(By.xpath("//a[@title='Next']"));
+                Actions actions = new Actions(driver);
+                actions.moveToElement(nextButton).perform();
+                Thread.sleep(1000);
+                nextButton.click();
+                System.out.println("prev");
+            } else {
+                System.out.println("null");
+                if (monthLeft.equals(inputMonth)) {
+                    extracted(driver, desiredDate, 1);
+                } else {
+                    Actions actions = new Actions(driver);
+                    actions.moveToElement(extracted(driver, desiredDate, 2)).perform();
+                    Thread.sleep(1000);
+                    extracted(driver, desiredDate, 2).click();
+                }
+            }
+        } while (!monthLeft.equals(inputMonth) && !monthRight.equals(inputMonth));
+
         Thread.sleep(5000);
 ///*		driver.close();
 		driver.quit();
+    }
+
+    private static WebElement extracted(WebDriver driver, LocalDate desiredDate, int position) {
+        return driver.findElement(By.xpath("(//a[@href='#'][normalize-space()='" + desiredDate.getDayOfMonth() + "'])[" + 2 + "]"));
     }
 
     private static void radioAndCheckbox(WebDriver driver, String elementStr, TypeDriver typeDriver) {
@@ -137,6 +194,21 @@ public class Section7 {
         if (typeDriver.equals(TypeDriver.NAME)){
             tick = driver.findElements(By.name(elementStr));
         }
+
+
+        List<WebElement> enabledElements = new ArrayList<>();
+        for (WebElement element : tick) {
+            if (element.isEnabled()) {
+                enabledElements.add(element);
+            }
+        }
+
+        // Nếu không có phần tử nào được kích hoạt, thông báo không tìm thấy và thoát
+        if (enabledElements.isEmpty()) {
+            System.out.println("Không tìm thấy radio button nào đang hoạt động với tên hoặc XPATH được cung cấp.");
+            return;
+        }
+
 
         if (!tick.isEmpty()) {
             Random random = new Random();
@@ -169,6 +241,18 @@ public class Section7 {
         // Click vào phần tử được chọn dựa trên chỉ số ngẫu nhiên
         options.get(randomIndex).click();
 
+    }
+
+    public static LocalDate convertStringToLocalDate(String dateString){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH);
+        LocalDate date = null;
+        try {
+            date = LocalDate.parse("01 " + dateString, formatter);
+            System.out.println("Converted LocalDate: " + date);
+        } catch (DateTimeParseException e) {
+            System.out.println("Invalid date format: " + e.getMessage());
+        }
+        return date;
     }
 
 
