@@ -81,6 +81,12 @@ public class Section71AddToCart {
             }
         }
 
+        int items = Integer.parseInt(driver.findElement(By.xpath("//tbody/tr[1]/td[3]/strong[1]")).getText());
+        if (items>0){
+            driver.findElement(By.cssSelector(".cart-icon")).click();
+        }
+
+
         // Đóng cửa sổ trình duyệt hiện tại
         Thread.sleep(10000);
         driver.close();
