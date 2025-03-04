@@ -1,8 +1,10 @@
 package com.learn.selenium;
 
 import com.learn.selenium.utils.LinkWebPratice;
+import com.learn.selenium.utils.MousePointerUI;
 import org.openqa.selenium.*;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.interactions.Actions;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -13,9 +15,14 @@ import java.util.List;
 @SpringBootApplication
 public class Section71AddToCart {
     public static void main(String[] args) throws InterruptedException {
+        System.setProperty("java.awt.headless", "false");
         SpringApplication.run(Section71AddToCart.class, args);
 
-        WebDriver driver = new FirefoxDriver();
+        // Tắt chế độ headless cho Firefox
+        FirefoxOptions options = new FirefoxOptions();
+        options.addArguments("--width=1280", "--height=720"); // Đảm bảo cửa sổ có kích thước rõ ràng
+
+        WebDriver driver = new FirefoxDriver(options);
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
         driver.manage().window().maximize();
         driver.get(LinkWebPratice.SELENIUM.getUrlLink());
@@ -83,7 +90,10 @@ public class Section71AddToCart {
 
         int items = Integer.parseInt(driver.findElement(By.xpath("//tbody/tr[1]/td[3]/strong[1]")).getText());
         if (items>0){
-            driver.findElement(By.cssSelector(".cart-icon")).click();
+            WebElement hoverCartIcon = driver.findElement(By.cssSelector(".cart-icon"));
+            hoverAction(driver, hoverCartIcon); // Di chuyển chuột đến biểu tượng giỏ hàng
+            Thread.sleep(500);
+            hoverCartIcon.click();
         }
 
 
@@ -120,6 +130,9 @@ public class Section71AddToCart {
 
     // Hàm hoverAction
     private static void hoverAction(WebDriver driver, WebElement element) {
+        // Di chuyển con trỏ chuột đến phần tử bằng MousePointerUI
+        MousePointerUI.moveMouseToElement(driver, element);
+
         Actions actions = new Actions(driver);
         actions.moveToElement(element).perform();
     }

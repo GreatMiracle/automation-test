@@ -2,11 +2,13 @@ package com.learn.selenium;
 
 import com.learn.selenium.utils.ElementFinding;
 import com.learn.selenium.utils.LinkWebPratice;
+import com.learn.selenium.utils.MousePointerUI;
 import com.learn.selenium.utils.TypeDriver;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -19,12 +21,16 @@ import java.time.Duration;
 public class Locator {
 
     public static void main(String[] args) throws InterruptedException {
+        System.setProperty("java.awt.headless", "false");
         SpringApplication.run(Locator.class, args);
 
         String userName = "rahul";
         String pwd = "hello123";
 
-        WebDriver driver = new FirefoxDriver();
+        // Tắt chế độ headless cho Firefox
+        FirefoxOptions options = new FirefoxOptions();
+
+        WebDriver driver = new FirefoxDriver(options);
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
         driver.manage().window().maximize();
         driver.get(LinkWebPratice.LOCATORS.getUrlLink());
@@ -40,6 +46,7 @@ public class Locator {
 //		driver.findElement(By.cssSelector("button[type='submit']")).click();
         WebElement submitButton = driver.findElement(By.cssSelector("button[type='submit']"));
         Actions actions = new Actions(driver);
+        MousePointerUI.moveMouseToElement(driver, submitButton);
         actions.moveToElement(submitButton).click().perform();
 
         if (driver.findElement(By.cssSelector(".error.error")).getText().equals("* Incorrect username or password")) {

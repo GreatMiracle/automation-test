@@ -7,6 +7,7 @@ public enum LinkWebPratice {
     SENT_BE("https://autofx-fe-dev.sentbe.net/login"),
     ASSERTIONS("https://www.spicejet.com/"),
     ALERT("https://rahulshettyacademy.com/AutomationPractice"),
+    LOGIN("https://rahulshettyacademy.com/loginpagePractise/#"),
 
     ;
 
